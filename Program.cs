@@ -10,23 +10,25 @@ using System.ComponentModel;
 
 namespace TH6
 {
-    public class Person
+    public class NhanVien
     {
         public string Hoten, Quequan;
-        public int Namsinh;
+        public double hsl, lcb;
 
-        public Person()
+        public NhanVien()
         {
             Hoten = string.Empty;
-            Quequan= string.Empty;
-            Namsinh = 0;
+            Quequan = string.Empty;
+            hsl = 0;
+            lcb = 0;
         }
 
-        public Person(string hoten, string quequan, int namsinh)
+        public NhanVien(string hoten, string quequan, double hsl, double lcb)
         {
             Hoten = hoten;
             Quequan = quequan;
-            Namsinh = namsinh;
+            this.hsl = hsl;
+            this.lcb = lcb;
         }
 
         public virtual void Nhap()
@@ -41,96 +43,117 @@ namespace TH6
             } while (Quequan == "");
             do
             {
-                Console.Write("Nhập năm sinh: "); Namsinh = int.Parse(Console.ReadLine());
-            } while (Namsinh < 1900);
+                Console.Write("Nhập hệ số lương: "); hsl = double.Parse(Console.ReadLine());
+            } while (hsl < 0);
+            do
+            {
+                Console.Write("Nhập lương cơ bản: "); lcb = double.Parse(Console.ReadLine());
+            } while (lcb <= 0);
         }
 
-        public virtual void HienThi()
+        public virtual double TinhLuong()
         {
-            Console.Write($"Họ tên sinh viên: {Hoten}\t\t Quê quán: {Quequan}\t\t Năm sinh: {Namsinh}\t\t");
+            return 0;
+        }
+
+        public void HienThi()
+        {
+            Console.WriteLine($"Họ tên: {Hoten}\t\t Quê quán: {Quequan}\t\t Hệ số lương: {hsl}\t\t Lương cb: {lcb} \t\t Lương: {TinhLuong()}");
         }
     }
 
-    public class SinhVien : Person
+    public class GiaoVien : NhanVien
     {
-        public int masv;
-        public string lop;
-
-        public SinhVien() : base()
-        {
-            masv = 0;
-            lop = string.Empty;
-        }
-
-        public SinhVien(string ht, string qq, int ns, int masv, string lop) : base(ht, qq, ns)
-        {
-            this.masv = masv;
-            this.lop = lop;
-            Hoten = ht;
-            Quequan = qq;
-            Namsinh = ns;
-        }
-
         public override void Nhap()
         {
             base.Nhap();
-            do
-            {
-                Console.Write("Nhập mã sinh viên: "); masv = int.Parse(Console.ReadLine());
-            } while (masv <= 0);
-            do
-            {
-                Console.Write("Nhập lớp: "); lop = Console.ReadLine();
-            } while (lop == "");
         }
 
-        public override void HienThi()
+        public override double TinhLuong()
+        {
+            return lcb * hsl * 1.4;
+        }
+
+        public new void HienThi()
         {
             base.HienThi();
-            Console.WriteLine($"Mã sinh viên: {masv}\t Lớp: {lop}");
+        }
+    }
+
+    public class NVHC : NhanVien
+    {
+        public override void Nhap()
+        {
+            base.Nhap();
+        }
+
+        public override double TinhLuong()
+        {
+            return hsl * lcb + 300000;
+        }
+
+        public new void HienThi()
+        {
+            base.HienThi();
         }
     }
 
     public class QuanLy
     {
-        private int soluongsv;
-        private Person[] sv;
+        private int soluongnv;
+        private NhanVien[] nv;
 
         public QuanLy()
         {
-            soluongsv = 0;
-            sv = new Person[0];
+            soluongnv = 0;
+            nv = new NhanVien[0];
         }
 
         public QuanLy(int soluongnv, int n)
         {
-            this.soluongsv = soluongnv;
-            sv = new Person[n];
+            this.soluongnv = soluongnv;
+            nv = new NhanVien[n];
         }
 
         public void Nhap()
         {
             do
             {
-                Console.Write("Nhập số lượng sinh viên: "); soluongsv = int.Parse(Console.ReadLine());
-            } while (soluongsv <= 0);
-            sv = new Person[soluongsv];
+                Console.Write("Nhập số lượng nhân viên: "); soluongnv = int.Parse(Console.ReadLine());
+            } while (soluongnv <= 0);
+            nv = new NhanVien[soluongnv];
 
-            for (int i = 0; i < soluongsv; i++)
-            {         
-                Console.WriteLine($"Sinh viên thứ {i + 1}");          
-                Person sv1 = new SinhVien();
-                sv1.Nhap();
-                sv[i] = sv1;
+            for (int i = 0; i < soluongnv; i++)
+            {
+                int chon;
+                Console.WriteLine($"Nhân viên thứ {i + 1}");
+                do
+                {
+                    Console.Write("1_Giáo viên, 2_Nhân viên hành chính. Chọn (1-2): ");
+                    chon = int.Parse(Console.ReadLine());
+                } while (chon < 1 || chon > 2);
+                switch (chon)
+                {
+                    case 1:
+                        NhanVien gv = new GiaoVien();
+                        gv.Nhap();
+                        nv[i] = gv;
+                        break;
+                    case 2:
+                        NhanVien nvhc = new NVHC();
+                        nvhc.Nhap();
+                        nv[i] = nvhc;
+                        break;
+                }
             }
         }
 
         public void HienThi()
         {
             Console.WriteLine("Danh sách nhân viên: ");
-            for (int i = 0; i < soluongsv; i++)
+            for (int i = 0; i < soluongnv; i++)
             {
-                sv[i].HienThi();
+                nv[i].HienThi();
             }
         }
     }
